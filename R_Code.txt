@@ -1,0 +1,77 @@
+***LIBRARIES USED***
+
+	> install.packages(data.table)
+	> library(data.table)
+
+	> install.packages(ggplot2)
+	> library(ggplot2)
+
+	> install.packages(ggmosaic)
+	> library(ggmosaic)
+
+	> install.packages(tidyr)
+	> library(tidyr)
+
+	> install.packages(readr)
+	> library(readr)
+
+***SUMMARISE DATA (mean, median, quantiles, etc.)***
+	> str(QVI_transaction_data)
+
+***EXAMINE WORD ENTIRES***
+	> productWords <- data.table(unlist(strsplit(unique(QVI_transaction_data[, PROD_NAME]), " ")))
+	> setnames(productWords, 'words')
+
+***REMOVE WORD = "salsa"***
+	> QVI_transaction_data[, SALSA := greply("salsa", tolower(PROD_NAME))]
+	> QVI_transaction_data <- QVI_transaction_data[SALSA == FALSE, ][, SALSA := NULL]
+
+***CREATING NEW COLUMN WITH DATA FROM ANOTHER COLUMN***
+---extraction of the first word of a column onto another---
+---new column name = " BRAND"---
+
+	> setDT(QVI_transaction_data)
+	> QVI_transaction_data[, BRAND := tstrsplit(PROD_NAME, " ")[[1]]]
+	> head(QVI_transaction_data[, .(PROD_NAME, BRAND)])
+
+***PLOTS***
+	> library(ggplot2)
+
+***CHANGE DATE FORMAT***
+	> QVI_transaction_data$DATE <- as.Date(QVI_transaction_data$DATE, origin = "1899-12-30")
+
+***FILTER DATASET TO FIND OUTLIER***
+	> library(dplyr)
+	> outliers <- df %>%
+  	> filter(Value < lower_bound | Value > upper_bound)
+	> print(outliers)
+
+
+***PLOTTING GRAPHS***
+
+	> install.packages("ggplot2")
+	> library("ggplot2")
+	> library("scales")
+	> theme_set(theme_bw())
+	> theme_updtate(plot.title = element_text(hhjust = 0.5))
+
+---Histogram---
+
+	> ggplot(QVI_transaction_data, aes(x = PACK_SIZE)) + geom_histogram(binwidth = 1, fill = "skyblue", color = "black") + 
+	labs(title = "Number of Transactions by Pack Size", x = "Pack Size", y = "Number of Transactions") + theme_minimal() +
+  	theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+---Plot---
+	> ggplot(transactions_by_day, aes(x = DATE, y = N)) + geom_line() + labs(x = "Day", y = "Number of transactions", title 
+	= "Transactions over time") + scale_x_date(breaks = "1 month") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+	
+
+***SAVING FILE***
+---Save file as .csv---
+
+	> install.packages(readr)
+	> library(readr) 
+	> write_csv(QVI_transaction_data, "QVI_transaction_data_PREPPED_DATA.csv")
+
+---Save files as .rds---
+	> save(QVI_transaction_data, file = "QVI_transaction_data_PREPPED_DATA.Rdata")
